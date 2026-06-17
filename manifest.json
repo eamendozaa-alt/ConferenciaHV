@@ -1,8 +1,8 @@
 {
-  "name": "IACYM CNC",
-  "short_name": "CNC",
-  "description": "Plataforma oficial de gestión IACYM CNC",
-  "start_url": "https://cnc.knack.com/iacym-cnc#bienvenida/",
+  "name": "CONFERENCIA HV",
+  "short_name": "HV",
+  "description": "Conferencia Hombres de valor",
+  "start_url": "https://cnc.knack.com/hombres-vencedores#inicio/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#00AEEF",
