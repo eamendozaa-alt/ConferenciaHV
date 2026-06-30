@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba qr-scanner</title>
+<style>
+  body { font-family: -apple-system, sans-serif; padding: 16px; background:#0d0d1a; color:#fff; margin:0; }
+  h2 { color: #f87171; font-size:18px; }
+  #video-container { width: 100%; max-width: 400px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 2px solid #a93226; }
+  video { width: 100%; display: block; }
+  #resultado { margin-top: 16px; padding: 14px; background: rgba(255,255,255,.06); border-radius: 10px; font-size: 16px; min-height: 24px; word-break: break-all; }
+  #resultado.exito { background: #166534; }
+  select { width: 100%; padding: 10px; margin-bottom: 12px; border-radius: 8px; background:#222; color:#fff; border:1px solid #444; }
+</style>
+</head>
+<body>
+<h2>🔍 Prueba aislada de qr-scanner</h2>
+<select id="selector-camara"><option>Cargando cámaras...</option></select>
+<div id="video-container">
+  <video id="qr-video"></video>
+</div>
+<div id="resultado">Esperando QR...</div>
+
+<script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
+<script>
+const videoElem = document.getElementById('qr-video');
+const resultadoDiv = document.getElementById('resultado');
+const selectorCamara = document.getElementById('selector-camara');
+let qrScanner = null;
+
+function mostrarResultado(texto) {
+  resultadoDiv.textContent = '✅ QR detectado: ' + texto;
+  resultadoDiv.classList.add('exito');
+}
+
+function iniciar(camaraId) {
+  if (qrScanner) { qrScanner.stop(); qrScanner.destroy(); }
+  qrScanner = new QrScanner(
+    videoElem,
+    result => mostrarResultado(typeof result === 'string' ? result : result.data),
+    {
+      preferredCamera: camaraId || 'environment',
+      highlightScanRegion: true,
+      highlightCodeOutline: true,
+    }
+  );
+  qrScanner.start().catch(err => {
+    resultadoDiv.textContent = '❌ Error al iniciar cámara: ' + err.message;
+  });
+}
+
+QrScanner.listCameras(true).then(camaras => {
+  selectorCamara.innerHTML = '';
+  camaras.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id;
+    o.text = c.label || 'Cámara';
+    selectorCamara.appendChild(o);
+  });
+  selectorCamara.addEventListener('change', () => iniciar(selectorCamara.value));
+  // Iniciar con cámara trasera por defecto usando el helper de la librería
+  iniciar('environment');
+}).catch(err => {
+  resultadoDiv.textContent = '❌ Error listando cámaras: ' + err.message;
+  iniciar('environment');
+});
+</script>
+</body>
+</html>
